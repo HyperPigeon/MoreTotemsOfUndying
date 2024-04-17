@@ -1,4 +1,4 @@
-# More Totems
+# More Totems of Undying
 
 ## Description
 
