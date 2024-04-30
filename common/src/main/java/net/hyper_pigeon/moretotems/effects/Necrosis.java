@@ -1,6 +1,5 @@
 package net.hyper_pigeon.moretotems.effects;
 
-
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffects;
@@ -12,20 +11,14 @@ public class Necrosis extends MobEffect {
         super(statusEffectCategory, i);
     }
 
-    public void applyEffectTick(LivingEntity entity, int i) {
-
-            if(entity.hasEffect(MobEffects.POISON)) {
-
-                if (entity.getHealth() < entity.getMaxHealth()) {
-                    entity.heal(0.3F);
-                }
-
-            }
-
-
+    public boolean applyEffectTick(LivingEntity entity, int i) {
+        if(entity.hasEffect(MobEffects.POISON)) {
+            entity.heal(0.3F);
+        }
+        return true;
     }
 
-    public boolean isDurationEffectTick(int duration, int i) {
+    public boolean shouldApplyEffectTickThisTick(int $$0, int $$1) {
         return true;
     }
 

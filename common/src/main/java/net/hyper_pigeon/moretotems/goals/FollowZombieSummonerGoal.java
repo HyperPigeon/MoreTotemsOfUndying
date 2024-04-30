@@ -8,7 +8,7 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.pathfinder.BlockPathTypes;
+import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 
 public class FollowZombieSummonerGoal extends Goal {
@@ -118,8 +118,8 @@ public class FollowZombieSummonerGoal extends Goal {
 
 
     private boolean method_23344(BlockPos blockPos) {
-        BlockPathTypes pathNodeType = WalkNodeEvaluator.getBlockPathTypeStatic(minion.getCommandSenderWorld(), new BlockPos.MutableBlockPos());
-        if (pathNodeType != BlockPathTypes.WALKABLE) {
+        PathType pathNodeType = WalkNodeEvaluator.getPathTypeStatic(minion, new BlockPos.MutableBlockPos());
+        if (pathNodeType != PathType.WALKABLE) {
             return false;
         } else {
             BlockState blockState = this.world.getBlockState(blockPos.below());

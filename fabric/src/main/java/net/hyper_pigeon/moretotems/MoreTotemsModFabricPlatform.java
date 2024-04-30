@@ -2,6 +2,7 @@ package net.hyper_pigeon.moretotems;
 
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.hyper_pigeon.moretotems.platform.MoreTotemsModPlatform;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -41,9 +42,10 @@ public class MoreTotemsModFabricPlatform implements MoreTotemsModPlatform {
     }
 
     @Override
-    public <T extends MobEffect> Supplier<T> registerMobEffect(String name, Supplier<T> mobEffect) {
-        return registerSupplier(BuiltInRegistries.MOB_EFFECT, name, mobEffect);
+    public Holder<MobEffect> registerMobEffect(String name, MobEffect mobEffect) {
+        return Registry.registerForHolder(BuiltInRegistries.MOB_EFFECT, new ResourceLocation(Constants.MOD_ID, name), mobEffect);
     }
+
 
     @Override
     public <T extends SoundEvent> Supplier<T> registerSound(String id, Supplier<T> sound) {

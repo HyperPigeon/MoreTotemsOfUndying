@@ -6,6 +6,7 @@ import net.hyper_pigeon.moretotems.register.EntityRegistry;
 import net.hyper_pigeon.moretotems.register.ItemRegistry;
 import net.hyper_pigeon.moretotems.register.StatusEffectRegistry;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.MinecraftServer;
@@ -13,6 +14,7 @@ import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.TicketType;
+import net.minecraft.tags.EntityTypeTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -22,7 +24,6 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobType;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.player.Player;
@@ -51,15 +52,13 @@ public abstract class LivingEntityMixin  extends Entity{
     public  native ItemStack getItemInHand(InteractionHand hand_1);
 
     @Shadow
-    public native boolean hasEffect(MobEffect effect);
+    public native boolean hasEffect(Holder<MobEffect> effect);
 
     @Shadow public native void setHealth(float health);
 
     @Shadow public native boolean removeAllEffects();
 
     @Shadow public native boolean addEffect(MobEffectInstance statusEffectInstance_1);
-
-    @Shadow public native MobType getMobType();
 
     @Shadow public abstract boolean addEffect(MobEffectInstance $$0, @Nullable Entity $$1);
 
@@ -378,7 +377,7 @@ public abstract class LivingEntityMixin  extends Entity{
                 /*totem saves player from an untimely death*/
                 this.setHealth(1.0F);
                 this.removeAllEffects();
-                this.addEffect(new MobEffectInstance(StatusEffectRegistry.SNIPER.get(), 2000, 0));
+                this.addEffect(new MobEffectInstance(StatusEffectRegistry.SNIPER, 2000, 0));
                 this.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 600, 0));
                 this.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 350, 1));
                 this.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 250, 0));
@@ -432,7 +431,7 @@ public abstract class LivingEntityMixin  extends Entity{
                 /*totem saves player from an untimely death*/
                 this.setHealth(1.0F);
                 this.removeAllEffects();
-                this.addEffect(new MobEffectInstance(StatusEffectRegistry.CEPHALOPOD.get(), 2000, 0));
+                this.addEffect(new MobEffectInstance(StatusEffectRegistry.CEPHALOPOD, 2000, 0));
                 this.addEffect(new MobEffectInstance(MobEffects.CONDUIT_POWER, 2000, 0));
                 this.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 950, 1));
                 this.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 200, 2));
@@ -467,7 +466,7 @@ public abstract class LivingEntityMixin  extends Entity{
 
             if(entity3 != null) {
 
-                if(((LivingEntity) entity3).hasEffect(StatusEffectRegistry.CEPHALOPOD.get()))
+                if(((LivingEntity) entity3).hasEffect(StatusEffectRegistry.CEPHALOPOD))
                 {
 
                     this.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 450, 1));
@@ -476,7 +475,7 @@ public abstract class LivingEntityMixin  extends Entity{
                 }
                 else {
 
-                    if(((LivingEntityMixin) entity).hasEffect(StatusEffectRegistry.CEPHALOPOD.get())) {
+                    if(((LivingEntityMixin) entity).hasEffect(StatusEffectRegistry.CEPHALOPOD)) {
 
                         ((LivingEntity) entity3).addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 450, 1));
                         ((LivingEntity) entity3).addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 150, 0));
@@ -533,7 +532,7 @@ public abstract class LivingEntityMixin  extends Entity{
                 /*totem saves player from an untimely death*/
                 this.setHealth(1.0F);
                 this.removeAllEffects();
-                this.addEffect(new MobEffectInstance(StatusEffectRegistry.NECROSIS.get(),2000,0));
+                this.addEffect(new MobEffectInstance(StatusEffectRegistry.NECROSIS,2000,0));
                 this.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 300,2));
                 this.addEffect(new MobEffectInstance(MobEffects.POISON, 400, 0));
 
@@ -584,10 +583,10 @@ public abstract class LivingEntityMixin  extends Entity{
     @Inject(at = @At("HEAD"), method = "isInvertedHealAndHarm", cancellable = true)
     public void NecroCheck(CallbackInfoReturnable<Boolean> callback) {
 
-        if (this.hasEffect(StatusEffectRegistry.NECROSIS.get())){
+        if (this.hasEffect(StatusEffectRegistry.NECROSIS)){
             callback.setReturnValue(true);
         }
-        else if(this.getMobType() == MobType.UNDEAD) {
+        else if(this.getType().is(EntityTypeTags.UNDEAD)) {
             callback.setReturnValue(true);
         }
 

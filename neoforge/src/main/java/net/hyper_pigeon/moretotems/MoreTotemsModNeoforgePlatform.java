@@ -1,6 +1,10 @@
 package net.hyper_pigeon.moretotems;
 
 import net.hyper_pigeon.moretotems.platform.MoreTotemsModPlatform;
+import net.minecraft.core.Holder;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.Entity;
@@ -14,6 +18,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class MoreTotemsModNeoforgePlatform implements MoreTotemsModPlatform {
@@ -38,9 +43,10 @@ public class MoreTotemsModNeoforgePlatform implements MoreTotemsModPlatform {
     }
 
     @Override
-    public <T extends MobEffect> Supplier<T> registerMobEffect(String name, Supplier<T> mobEffect) {
-        return MoreTotemsModNeoforge.MOB_EFFECTS.register(name, mobEffect);
+    public Holder<MobEffect> registerMobEffect(String name, MobEffect mobEffect) {
+        return MoreTotemsModNeoforge.MOB_EFFECTS.register(name,() -> mobEffect);
     }
+
 
     @Override
     public <T extends SoundEvent> Supplier<T> registerSound(String id, Supplier<T> sound) {

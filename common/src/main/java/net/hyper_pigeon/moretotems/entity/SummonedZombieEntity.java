@@ -36,9 +36,9 @@ public class SummonedZombieEntity extends Zombie {
         this.getAttribute(Attributes.ARMOR).setBaseValue(2.8D);
     }
 
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(SUMMONER_UUID, Optional.empty());
+    protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder syncedDataBuilder) {
+        super.defineSynchedData(syncedDataBuilder);
+        syncedDataBuilder.define(SUMMONER_UUID, Optional.empty());
     }
 
     @Override

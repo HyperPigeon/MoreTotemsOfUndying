@@ -5,6 +5,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -24,9 +25,9 @@ public abstract class PersistentProjectileEntityMixin extends Entity {
     }
 
 
-    @Inject(method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;)V", at = @At("RETURN"))
-    private void onInit(EntityType $$0, LivingEntity owner, Level $$2, CallbackInfo ci) {
-        if (owner.hasEffect(StatusEffectRegistry.SNIPER.get())) {
+    @Inject(method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;)V", at = @At("RETURN"))
+    private void onInit(EntityType $$0, LivingEntity owner, Level $$2, ItemStack $$3, CallbackInfo ci) {
+        if (owner.hasEffect(StatusEffectRegistry.SNIPER)) {
             this.baseDamage = baseDamage * 2;
         }
     }

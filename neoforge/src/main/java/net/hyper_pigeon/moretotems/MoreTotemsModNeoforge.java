@@ -29,6 +29,7 @@ public class MoreTotemsModNeoforge {
 
     public MoreTotemsModNeoforge(IEventBus modEventBus) {
 
+
         SOUND_EVENTS.register(modEventBus);
         BLOCKS.register(modEventBus);
         BLOCK_ENTITIES.register(modEventBus);
@@ -36,6 +37,7 @@ public class MoreTotemsModNeoforge {
         CREATIVE_TABS.register(modEventBus);
         ITEMS.register(modEventBus);
         MOB_EFFECTS.register(modEventBus);
+
         modEventBus.<EntityAttributeCreationEvent>addListener(event -> EntityRegistry.registerEntityAttributes(event::put));
 
         MoreTotemsMod.init();

@@ -1,6 +1,5 @@
 package net.hyper_pigeon.moretotems.mixin;
 
-import net.hyper_pigeon.moretotems.MoreTotemsMod;
 import net.hyper_pigeon.moretotems.register.ItemRegistry;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.world.InteractionHand;
