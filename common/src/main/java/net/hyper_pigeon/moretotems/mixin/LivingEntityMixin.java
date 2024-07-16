@@ -121,7 +121,7 @@ public abstract class LivingEntityMixin  extends Entity{
                 /*Spawns a tntEntity on the player upon use of Explosive Totem*/
 
                 PrimedTnt tntEntity = EntityType.TNT.create(level());
-                tntEntity.setFuse(5);
+                tntEntity.setFuse(10);
                 tntEntity.moveTo(this.getX() , this.getY() , this.getZ(), 0, 0);
                 level().addFreshEntity(tntEntity);
 
