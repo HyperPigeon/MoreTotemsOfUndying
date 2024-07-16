@@ -25,8 +25,8 @@ public abstract class PersistentProjectileEntityMixin extends Entity {
     }
 
 
-    @Inject(method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;)V", at = @At("RETURN"))
-    private void onInit(EntityType $$0, LivingEntity owner, Level $$2, ItemStack $$3, CallbackInfo ci) {
+    @Inject(method = "<init>(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/world/item/ItemStack;)V", at = @At("RETURN"))
+    private void onInit(EntityType $$0, LivingEntity owner, Level $$2, ItemStack $$3, ItemStack $$4, CallbackInfo ci) {
         if (owner.hasEffect(StatusEffectRegistry.SNIPER)) {
             this.baseDamage = baseDamage * 2;
         }

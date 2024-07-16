@@ -43,7 +43,7 @@ public class MoreTotemsModFabricPlatform implements MoreTotemsModPlatform {
 
     @Override
     public Holder<MobEffect> registerMobEffect(String name, MobEffect mobEffect) {
-        return Registry.registerForHolder(BuiltInRegistries.MOB_EFFECT, new ResourceLocation(Constants.MOD_ID, name), mobEffect);
+        return Registry.registerForHolder(BuiltInRegistries.MOB_EFFECT,  ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, name), mobEffect);
     }
 
 
@@ -71,7 +71,7 @@ public class MoreTotemsModFabricPlatform implements MoreTotemsModPlatform {
      * Quick wrapper to make the individual registration lines cleaner but still return the multiloader-compatible supplier
      */
     private static <T, R extends Registry<? super T>> Supplier<T> registerSupplier(R registry, String id, Supplier<T> object) {
-        final T registeredObject = Registry.register((Registry<T>)registry, new ResourceLocation(Constants.MOD_ID, id), object.get());
+        final T registeredObject = Registry.register((Registry<T>)registry,  ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, id), object.get());
 
         return () -> registeredObject;
     }

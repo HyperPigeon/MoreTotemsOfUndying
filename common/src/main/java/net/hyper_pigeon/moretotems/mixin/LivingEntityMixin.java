@@ -30,6 +30,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -254,21 +255,31 @@ public abstract class LivingEntityMixin  extends Entity{
 
                 ServerPlayer player = (ServerPlayer) entity;
                 ServerLevel dest = Objects.requireNonNullElse(player.getServer().getLevel(player.getRespawnDimension()), player.getServer().overworld());
-                Vec3 spawn_pointer = Optional.ofNullable(player.getRespawnPosition())
-                        // Get player respawn position
-                        .flatMap(pos -> Player.findRespawnPositionAndUseSpawnBlock(dest, pos, player.getRespawnAngle(), player.isRespawnForced(), true))
-                        .orElseGet(() -> {
-                            // Get world spawn if not possible
-                            BlockPos worldSpawn = dest.getSharedSpawnPos();
-                            return new Vec3(worldSpawn.getX() + 0.5, worldSpawn.getY() + 0.1, worldSpawn.getZ() + 0.5);
-                        });
+//                Vec3 spawn_pointer = Optional.ofNullable(player.getRespawnPosition())
+//                        // Get player respawn position
+//                        .flatMap(pos -> ServerPlayer.findRespawnPositionAndUseSpawnBlock(true,DimensionTransition.DO_NOTHING))
+//                        .orElseGet(() -> {
+//                            // Get world spawn if not possible
+//                            BlockPos worldSpawn = dest.getSharedSpawnPos();
+//                            return new Vec3(worldSpawn.getX() + 0.5, worldSpawn.getY() + 0.1, worldSpawn.getZ() + 0.5);
+//                        });
 
-                TickTask teleport_shift = new TickTask((getServer().getTickCount()) + 1, () -> {
-                    // Load chunk for spawning
-                    dest.getChunkSource().addRegionTicket(TicketType.POST_TELEPORT, new ChunkPos(SectionPos.posToSectionCoord(spawn_pointer.x), SectionPos.posToSectionCoord(spawn_pointer.z)), 1, player.getId());
-                    player.teleportTo(dest, spawn_pointer.x(), spawn_pointer.y(), spawn_pointer.z(), 5.0F, 5.0F);
-                });
-                the_server.tell(teleport_shift);
+//                Vec3 spawn_pointer = Vec3.atLowerCornerOf(player.getRespawnPosition());
+
+//                TickTask teleport_shift = new TickTask((getServer().getTickCount()) + 1, () -> {
+//                    // Load chunk for spawning
+//                    dest.getChunkSource().addRegionTicket(TicketType.POST_TELEPORT, new ChunkPos(SectionPos.posToSectionCoord(spawn_pointer.x), SectionPos.posToSectionCoord(spawn_pointer.z)), 1, player.getId());
+//                    player.changeDimension(new DimensionTransition(dest, this.position(), player.getDeltaMovement(),player.getYRot(), player.getXRot(), DimensionTransition.DO_NOTHING));
+//                    player.teleportTo(dest, spawn_pointer.x(), spawn_pointer.y(), spawn_pointer.z(), 5.0F, 5.0F);
+//                });
+
+//                player.teleportTo();
+
+//                the_server.tell(teleport_shift);
+
+                dest.getChunkSource().addRegionTicket(TicketType.POST_TELEPORT, new ChunkPos(SectionPos.posToSectionCoord(player.getRespawnPosition().getX()), SectionPos.posToSectionCoord(player.getRespawnPosition().getZ())), 1, player.getId());
+                player.changeDimension(new DimensionTransition(dest, this.position(), player.getDeltaMovement(),player.getYRot(), player.getXRot(), DimensionTransition.DO_NOTHING));
+                player.teleportTo(dest, player.getRespawnPosition().getX(), player.getRespawnPosition().getY(), player.getRespawnPosition().getZ(), 5.0F, 5.0F);
 
                 this.level().addParticle(ParticleTypes.PORTAL,
                         this.getRandomX(0.5D),
@@ -591,6 +602,8 @@ public abstract class LivingEntityMixin  extends Entity{
         }
 
     }
+
+
 
 
 }
