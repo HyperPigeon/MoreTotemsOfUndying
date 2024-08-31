@@ -1,0 +1,33 @@
+{
+  "replace": false,
+  "type": "jeed:effect_provider",
+  "effect": "minecraft:absorption",
+  "providers": [
+    {
+		"item": "moretotems:explosive_totem_of_undying"
+	},
+	{
+		"item": "moretotems:stinging_totem_of_undying"
+	},
+	{
+		"item": "moretotems:teleporting_totem_of_undying"
+	},
+	{
+		"item": "moretotems:tentacled_totem_of_undying"
+	},
+	{
+		"item": "moretotems:rotting_totem_of_undying"
+	},
+	{
+		"item": "moretotems:skeletal_totem_of_undying"
+	}
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "jeed"
+      ]
+    }
+  ]
+}

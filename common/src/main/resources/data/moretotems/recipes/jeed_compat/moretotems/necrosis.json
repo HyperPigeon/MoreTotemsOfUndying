@@ -1,0 +1,17 @@
+{
+  "type": "jeed:effect_provider",
+  "effect": "moretotems:necrosis",
+  "providers": [
+    {
+      "item": "moretotems:rotting_totem_of_undying"
+    }
+  ],
+  "fabric:load_conditions": [
+    {
+      "condition": "fabric:all_mods_loaded",
+      "values": [
+        "jeed"
+      ]
+    }
+  ]
+}
