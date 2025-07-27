@@ -13,6 +13,7 @@ import net.minecraft.world.entity.ai.goal.ZombieAttackGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.level.Level;
+
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,7 +26,6 @@ public class SummonedZombieEntity extends Zombie {
     public SummonedZombieEntity(EntityType<? extends Zombie> type, Level world) {
         super(type, world);
     }
-
 
 
     @Override
@@ -66,19 +66,18 @@ public class SummonedZombieEntity extends Zombie {
         this.setSummonerUuid(player.getUUID());
     }
 
-
-
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
-        tag.putUUID("SummonerUUID", getSummonerUuid().get());
+        getSummonerUuid().ifPresent(uuid -> {
+            tag.putString("SummonerUUID", uuid.toString());
+        });
     }
-
 
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         UUID id;
         if (tag.contains("SummonerUUID")) {
-           id = tag.getUUID("SummonerUUID");
+            id = tag.getUUID("SummonerUUID");
         } else {
             id = tag.getUUID("SummonerUUID");
         }
@@ -88,12 +87,10 @@ public class SummonedZombieEntity extends Zombie {
     }
 
 
-
     @Override
     public void setLastHurtByMob(LivingEntity attacker) {
-        if(attacker == getSummoner()) {
-        }
-        else {
+        if (attacker == getSummoner()) {
+        } else {
             super.setLastHurtByMob(attacker);
         }
     }
@@ -108,10 +105,6 @@ public class SummonedZombieEntity extends Zombie {
                 } else if (getSummoner().getLastHurtMob() != null) {
                     this.setTarget(getSummoner().getLastHurtMob());
                 }
-            }
-            else {
-
-
             }
         }
         super.aiStep();
@@ -130,8 +123,6 @@ public class SummonedZombieEntity extends Zombie {
     static {
         SUMMONER_UUID = SynchedEntityData.defineId(SummonedZombieEntity.class, EntityDataSerializers.OPTIONAL_UUID);
     }
-
-
 
 
 }
