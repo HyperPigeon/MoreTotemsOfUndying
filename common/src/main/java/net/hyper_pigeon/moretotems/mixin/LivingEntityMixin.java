@@ -115,7 +115,7 @@ public abstract class LivingEntityMixin  extends Entity{
                 this.removeAllEffects();
                 this.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 125, 2));
                 this.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 350, 4));
-                this.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 2));
+                this.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 3));
                 this.level().broadcastEntityEvent(this, (byte)35);
 
                 /*Spawns a tntEntity on the player upon use of Explosive Totem*/
