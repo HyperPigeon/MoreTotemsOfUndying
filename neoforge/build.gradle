@@ -7,6 +7,7 @@ plugins {
 base {
     archivesName = "${mod_name}-neoforge-${minecraft_version}"
 }
+gradle.startParameter.excludedTaskNames.add("test")
 
 // Automatically enable neoforge AccessTransformers if the file exists
 // This location is hardcoded in FML and can not be changed.
@@ -18,17 +19,17 @@ runs {
     configureEach {
         modSource project.sourceSets.main
     }
-    client {
-        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-    }
-    server {
-        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-        programArgument '--nogui'
-    }
-
-    gameTestServer {
-        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
-    }
+//    client {
+//        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+//    }
+//    server {
+//        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+//        programArgument '--nogui'
+//    }
+//
+//    gameTestServer {
+//        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
+//    }
 
     data {
         programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
