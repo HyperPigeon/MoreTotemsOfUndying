@@ -1,0 +1,40 @@
+{
+  "item.moretotems.explosive_totem_of_undying": "Partlayıcı Ölümsüzlük Totemi",
+
+  "item.moretotems.stinging_totem_of_undying": "Dalayıcı Ölümsüzlük Totemi",
+
+  "item.moretotems.teleporting_totem_of_undying": "Teleportasiya Ölümsüzlük Totemi",
+
+  "item.moretotems.ghastly_totem_of_undying": "Ghastly Ölümsüzlük Totemi",
+
+  "item.moretotems.skeletal_totem_of_undying": "Dəhşətli Ölümsüzlük Totemi",
+
+  "item.moretotems.tentacled_totem_of_undying": "Dokunaklı Ölümsüzlük Totemi",
+
+  "item.moretotems.rotting_totem_of_undying": "Çürüyən Ölümsüzlük Totemi",
+
+  "effect.moretotems.sniper": "Snayper",
+
+  "effect.moretotems.sniper.description": "Mərmilərin vurduğu zərəri artırır.",
+  
+  "effect.moretotems.sniper.desc": "Mərmilərin vurduğu zərəri artırır.",
+
+  "effect.moretotems.necrosis": "Nekroz",
+
+  "effect.moretotems.necrosis.description": "Zəhər və Ani Zərər sizi sağaldır, Bərpa və Ani Şəfa isə sizə zərər verir.",
+  
+  "effect.moretotems.necrosis.desc": "Zəhər və Ani Zərər sizi sağaldır, Bərpa və Ani Şəfa isə sizə zərər verir.",
+
+  "effect.moretotems.cephalopod": "Sefalopod",
+
+  "effect.moretotems.cephalopod.description": "Hücum edən dəstələr mürəkkəblə yavaşlayacaq və korlanacaq, onların yol tapmasını və bütün dəstələrin aşkarlanmasını müvəqqəti olaraq söndürəcək. Effekt sahibinin hücumuna məruz qalan dəstələr kor olacaq və heç bir obyekti aşkar edə bilməyəcəklər.",
+  
+  "effect.moretotems.cephalopod.desc": "Hücum edən dəstələr mürəkkəblə yavaşlayacaq və korlanacaq, onların yol tapmasını və bütün dəstələrin aşkarlanmasını müvəqqəti olaraq söndürəcək. Hücuma məruz qalan kütlələr kor olacaq və heç bir varlığı aşkar edə bilməyəcəklər.",
+
+  "entity.moretotems.summoned_bee": "Totem Arı",
+
+  "entity.moretotems.summoned_zombie": "Totem Zombi",
+
+  "itemGroup.moretotems.moretotems_items": "More Totems of Undying"
+
+}
