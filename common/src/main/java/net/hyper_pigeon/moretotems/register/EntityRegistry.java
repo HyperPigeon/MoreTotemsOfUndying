@@ -4,7 +4,6 @@ import net.hyper_pigeon.moretotems.Constants;
 import net.hyper_pigeon.moretotems.MoreTotemsMod;
 import net.hyper_pigeon.moretotems.entity.SummonedBeeEntity;
 import net.hyper_pigeon.moretotems.entity.SummonedZombieEntity;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
