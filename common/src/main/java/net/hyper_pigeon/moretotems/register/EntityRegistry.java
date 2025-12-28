@@ -1,8 +1,13 @@
 package net.hyper_pigeon.moretotems.register;
 
+import net.hyper_pigeon.moretotems.Constants;
 import net.hyper_pigeon.moretotems.MoreTotemsMod;
 import net.hyper_pigeon.moretotems.entity.SummonedBeeEntity;
 import net.hyper_pigeon.moretotems.entity.SummonedZombieEntity;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -26,6 +31,8 @@ public class EntityRegistry {
     }
 
     private static <T extends Mob> Supplier<EntityType<T>> registerEntity(String name, EntityType.EntityFactory<T> entity, float width, float height, MobCategory mobCategory) {
-        return MoreTotemsMod.COMMON_PLATFORM.registerEntity(name, () -> EntityType.Builder.of(entity,mobCategory).sized(width, height).build(name));
+        ResourceLocation resourceLocation = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, name);
+        ResourceKey<EntityType<?>> key =  ResourceKey.create(Registries.ENTITY_TYPE, resourceLocation);
+        return MoreTotemsMod.COMMON_PLATFORM.registerEntity(name, () -> EntityType.Builder.of(entity,mobCategory).sized(width, height).build(key));
     }
 }
