@@ -5,7 +5,7 @@ import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRe
 import net.hyper_pigeon.moretotems.register.EntityRegistry;
 
 public class MoreTotemsModFabric implements ModInitializer {
-    
+
     @Override
     public void onInitialize() {
         MoreTotemsMod.init();

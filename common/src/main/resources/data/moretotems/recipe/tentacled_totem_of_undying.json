@@ -6,12 +6,8 @@
     "III"
   ],
   "key": {
-    "I": {
-      "item": "minecraft:ink_sac"
-    },
-    "T": {
-      "item": "minecraft:totem_of_undying"
-    }
+    "I": "minecraft:ink_sac",
+    "T": "minecraft:totem_of_undying"
   },
   "result": {
     "id": "moretotems:tentacled_totem_of_undying",

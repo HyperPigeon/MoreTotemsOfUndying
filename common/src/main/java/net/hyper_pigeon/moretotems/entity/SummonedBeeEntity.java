@@ -1,9 +1,9 @@
 package net.hyper_pigeon.moretotems.entity;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Bee;
@@ -19,7 +19,7 @@ public class SummonedBeeEntity extends Bee {
     }
 
     public static AttributeSupplier.Builder createTotemBeeAttributes() {
-        return Mob.createMobAttributes().add(Attributes.MAX_HEALTH, 15.0D).add(Attributes.FLYING_SPEED, 2.5D).add(Attributes.MOVEMENT_SPEED, 2.5D).add(Attributes.ATTACK_DAMAGE, 5.0D).add(Attributes.FOLLOW_RANGE, 48.0D);
+        return Bee.createAttributes().add(Attributes.MAX_HEALTH, 15.0D).add(Attributes.FLYING_SPEED, 4D).add(Attributes.ATTACK_DAMAGE, 6D);
     }
 
     public void setSummoner(Entity player) {
@@ -27,19 +27,18 @@ public class SummonedBeeEntity extends Bee {
     }
 
 
+    protected void customServerAiStep(ServerLevel $$0) {
 
-    protected void customServerAiStep() {
+        if (summoner instanceof Player) {
 
-        if(summoner instanceof Player) {
-
-           if(((Player) summoner).getLastHurtByMob() != null) {
+            if (((Player) summoner).getLastHurtByMob() != null) {
 
 
-               this.setBeeAttacker(((Player) summoner).getLastHurtByMob());
+                this.setBeeAttacker(((Player) summoner).getLastHurtByMob());
 
-           }
+            }
 
-            if(((Player) summoner).getLastHurtMob() != null) {
+            if (((Player) summoner).getLastHurtMob() != null) {
 
                 this.setBeeAttacker(((Player) summoner).getLastHurtMob());
 
@@ -48,12 +47,12 @@ public class SummonedBeeEntity extends Bee {
 
         }
 
-        super.customServerAiStep();
+        super.customServerAiStep($$0);
 
     }
 
     private boolean setBeeAttacker(LivingEntity attacker) {
-        if(attacker.equals(summoner)) {
+        if (attacker.equals(summoner)) {
             return false;
         }
         setLastHurtByMob(attacker);
@@ -62,29 +61,21 @@ public class SummonedBeeEntity extends Bee {
     }
 
 
+    public boolean doHurtTarget(ServerLevel $$0, Entity target) {
 
-
-
-    public boolean doHurtTarget(Entity target) {
-
-        if(target.equals(summoner)) {
+        if (target.equals(summoner)) {
             return false;
-        }
-        else if (this.hasStung()){
+        } else if (this.hasStung()) {
 
             return false;
 
-        }
-        else {
+        } else {
 
-            return super.doHurtTarget(target);
+            return super.doHurtTarget($$0,target);
 
         }
 
     }
-
-
-
 
 
 }

@@ -5,16 +5,15 @@ import net.hyper_pigeon.moretotems.entity.SummonedZombieEntity;
 import net.hyper_pigeon.moretotems.register.EntityRegistry;
 import net.hyper_pigeon.moretotems.register.ItemRegistry;
 import net.hyper_pigeon.moretotems.register.StatusEffectRegistry;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.TickTask;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.TicketType;
 import net.minecraft.tags.EntityTypeTags;
+import net.minecraft.util.Unit;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -22,17 +21,17 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.item.PrimedTnt;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.portal.DimensionTransition;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.portal.TeleportTransition;
 import org.jetbrains.annotations.Nullable;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -40,30 +39,34 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Objects;
-import java.util.Optional;
 
 /*The goal of this Mixin class is to give the totems the same ability to save the player from death, along with
 some unique custom features*/
 
 @Mixin(LivingEntity.class)
-public abstract class LivingEntityMixin  extends Entity{
+public abstract class LivingEntityMixin extends Entity {
 
 
     @Shadow
-    public  native ItemStack getItemInHand(InteractionHand hand_1);
+    public native ItemStack getItemInHand(InteractionHand hand_1);
 
     @Shadow
     public native boolean hasEffect(Holder<MobEffect> effect);
 
-    @Shadow public native void setHealth(float health);
+    @Shadow
+    public native void setHealth(float health);
 
-    @Shadow public native boolean removeAllEffects();
+    @Shadow
+    public native boolean removeAllEffects();
 
-    @Shadow public native boolean addEffect(MobEffectInstance statusEffectInstance_1);
+    @Shadow
+    public native boolean addEffect(MobEffectInstance statusEffectInstance_1);
 
-    @Shadow public abstract boolean addEffect(MobEffectInstance $$0, @Nullable Entity $$1);
+    @Shadow
+    public abstract boolean addEffect(MobEffectInstance $$0, @Nullable Entity $$1);
 
-    @Shadow public abstract Brain<?> getBrain();
+    @Shadow
+    public abstract Brain<?> getBrain();
 
     public EntityType<SummonedBeeEntity> s_bee = EntityRegistry.SUMMONED_BEE.get();
 
@@ -74,11 +77,10 @@ public abstract class LivingEntityMixin  extends Entity{
     }
 
 
-
     @Inject(at = @At("HEAD"), method = "checkTotemDeathProtection", cancellable = true)
     public void useExplosiveTotem(DamageSource damageSource_1, CallbackInfoReturnable<Boolean> callback) {
         /*inits PlayerEntity entity, which is a copy of this casted to Living Entity and then PlayerEntity*/
-        Entity entity =  this;
+        Entity entity = this;
 
 
 
@@ -88,21 +90,19 @@ public abstract class LivingEntityMixin  extends Entity{
         ItemStack mainhand_stack = ((LivingEntityMixin) entity).getItemInHand(InteractionHand.MAIN_HAND);
 
         //Executes if the item in offhand_stack is equal to the explosive totem of Undying
-        if ((offhand_stack.getItem() == ItemRegistry.EXPLOSIVE_TOTEM_OF_UNDYING.get()) || (mainhand_stack.getItem() == ItemRegistry.EXPLOSIVE_TOTEM_OF_UNDYING.get()) ) {
+        if ((offhand_stack.getItem() == ItemRegistry.EXPLOSIVE_TOTEM_OF_UNDYING.get()) || (mainhand_stack.getItem() == ItemRegistry.EXPLOSIVE_TOTEM_OF_UNDYING.get())) {
 
             /*If the damagesource is something that could kill a player in creative mode, the totem does not work*/
             if (damageSource_1.type().equals(DamageTypes.FELL_OUT_OF_WORLD)) {
 
                 callback.setReturnValue(false);
-            }
-            else {
+            } else {
                 /*sets copy to offhand_stack*/
                 /*deletes explosive totem from offhand*/
 
-                if((offhand_stack.getItem() == ItemRegistry.EXPLOSIVE_TOTEM_OF_UNDYING.get())) {
+                if ((offhand_stack.getItem() == ItemRegistry.EXPLOSIVE_TOTEM_OF_UNDYING.get())) {
                     offhand_stack.shrink(1);
-                }
-                else if((mainhand_stack.getItem() == ItemRegistry.EXPLOSIVE_TOTEM_OF_UNDYING.get())){
+                } else if ((mainhand_stack.getItem() == ItemRegistry.EXPLOSIVE_TOTEM_OF_UNDYING.get())) {
 
                     mainhand_stack.shrink(1);
 
@@ -116,18 +116,16 @@ public abstract class LivingEntityMixin  extends Entity{
                 this.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 125, 2));
                 this.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 350, 4));
                 this.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 3));
-                this.level().broadcastEntityEvent(this, (byte)35);
+                this.level().broadcastEntityEvent(this, (byte) 35);
 
                 /*Spawns a tntEntity on the player upon use of Explosive Totem*/
 
-                PrimedTnt tntEntity = EntityType.TNT.create(level());
+                PrimedTnt tntEntity = EntityType.TNT.create(level(), EntitySpawnReason.SPAWN_ITEM_USE);
                 tntEntity.setFuse(10);
-                tntEntity.moveTo(this.getX() , this.getY() , this.getZ(), 0, 0);
+                tntEntity.moveTo(this.getX(), this.getY(), this.getZ(), 0, 0);
                 level().addFreshEntity(tntEntity);
 
                 callback.setReturnValue(true);
-
-
 
 
             }
@@ -141,7 +139,7 @@ public abstract class LivingEntityMixin  extends Entity{
     @Inject(at = @At("HEAD"), method = "checkTotemDeathProtection", cancellable = true)
     public void useStingingTotem(DamageSource damageSource_1, CallbackInfoReturnable<Boolean> callback) {
         /*inits PlayerEntity entity, which is a copy of this casted to Living Entity and then PlayerEntity*/
-        Entity entity =  this;
+        Entity entity = this;
 
 
         /*ItemStack object that is set to the offhand item that entity is carrying*/
@@ -158,13 +156,11 @@ public abstract class LivingEntityMixin  extends Entity{
             if (damageSource_1.type().equals(DamageTypes.FELL_OUT_OF_WORLD)) {
 
                 callback.setReturnValue(false);
-            }
-            else {
+            } else {
                 /*deletes explosive totem from offhand*/
-                if((offhand_stack.getItem() == ItemRegistry.STINGING_TOTEM_OF_UNDYING.get())) {
+                if ((offhand_stack.getItem() == ItemRegistry.STINGING_TOTEM_OF_UNDYING.get())) {
                     offhand_stack.shrink(1);
-                }
-                else if((mainhand_stack.getItem() == ItemRegistry.STINGING_TOTEM_OF_UNDYING.get())){
+                } else if ((mainhand_stack.getItem() == ItemRegistry.STINGING_TOTEM_OF_UNDYING.get())) {
                     mainhand_stack.shrink(1);
                 }
 
@@ -174,42 +170,41 @@ public abstract class LivingEntityMixin  extends Entity{
                 this.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 650, 1));
                 this.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 1500, 1));
                 //this.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 500, 2));
-                this.level().broadcastEntityEvent(this, (byte)35);
+                this.level().broadcastEntityEvent(this, (byte) 35);
 
                 /*Spawns a SummonedBeeEntity on the player upon use of Stinging Totem*/
 
 
-
-                SummonedBeeEntity summonedBeeEntity_1 = s_bee.create(level());
+                SummonedBeeEntity summonedBeeEntity_1 = s_bee.create(level(), EntitySpawnReason.SPAWN_ITEM_USE);
                 summonedBeeEntity_1.setSummoner(this);
                 summonedBeeEntity_1.moveTo(this.getX(), this.getY() + 1, this.getZ(), 0, 0);
                 level().addFreshEntity(summonedBeeEntity_1);
 
 
-                SummonedBeeEntity summonedBeeEntity_2 = s_bee.create(level());
+                SummonedBeeEntity summonedBeeEntity_2 = s_bee.create(level(), EntitySpawnReason.SPAWN_ITEM_USE);
                 summonedBeeEntity_2.setSummoner(this);
                 summonedBeeEntity_2.moveTo(this.getX(), this.getY() + 1, this.getZ(), 0, 0);
                 level().addFreshEntity(summonedBeeEntity_2);
 
-                SummonedBeeEntity summonedBeeEntity_3 = s_bee.create(level());
+                SummonedBeeEntity summonedBeeEntity_3 = s_bee.create(level(), EntitySpawnReason.SPAWN_ITEM_USE);
                 summonedBeeEntity_3.setSummoner(this);
                 summonedBeeEntity_3.moveTo(this.getX() + 1, this.getY() + 1, this.getZ(), 0, 0);
                 level().addFreshEntity(summonedBeeEntity_3);
 
-                SummonedBeeEntity summonedBeeEntity_4 = s_bee.create(level());
+                SummonedBeeEntity summonedBeeEntity_4 = s_bee.create(level(), EntitySpawnReason.SPAWN_ITEM_USE);
                 summonedBeeEntity_4.setSummoner(this);
                 summonedBeeEntity_4.moveTo(this.getX(), this.getY() + 1, this.getZ() + 1, 0, 0);
                 level().addFreshEntity(summonedBeeEntity_4);
 
-                SummonedBeeEntity summonedBeeEntity_5 = s_bee.create(level());
+                SummonedBeeEntity summonedBeeEntity_5 = s_bee.create(level(), EntitySpawnReason.SPAWN_ITEM_USE);
                 summonedBeeEntity_5.setSummoner(this);
                 summonedBeeEntity_5.moveTo(this.getX() - 1, this.getY() + 1, this.getZ(), 0, 0);
                 level().addFreshEntity(summonedBeeEntity_5);
 
 
-                SummonedBeeEntity summonedBeeEntity_6 = s_bee.create(level());
+                SummonedBeeEntity summonedBeeEntity_6 = s_bee.create(level(), EntitySpawnReason.SPAWN_ITEM_USE);
                 summonedBeeEntity_5.setSummoner(this);
-                summonedBeeEntity_5.moveTo(this.getX() , this.getY() + 1, this.getZ()-1, 0, 0);
+                summonedBeeEntity_5.moveTo(this.getX(), this.getY() + 1, this.getZ() - 1, 0, 0);
                 level().addFreshEntity(summonedBeeEntity_6);
 
                 callback.setReturnValue(true);
@@ -224,7 +219,7 @@ public abstract class LivingEntityMixin  extends Entity{
     public void useTeleportingTotem(DamageSource damageSource_1, CallbackInfoReturnable<Boolean> callback) {
 
         /*inits PlayerEntity entity, which is a copy of this casted to Living Entity and then PlayerEntity*/
-        LivingEntity entity = (LivingEntity)(Object)this;
+        LivingEntity entity = (LivingEntity) (Object) this;
 
         /*ItemStack object that is set to the offhand item that entity is carrying*/
         ItemStack offhand_stack = entity.getItemInHand(InteractionHand.OFF_HAND);
@@ -236,10 +231,9 @@ public abstract class LivingEntityMixin  extends Entity{
 
             /*sets copy to offhand_stack*/
 
-            if((offhand_stack.getItem() == ItemRegistry.TELEPORTING_TOTEM_OF_UNDYING.get())) {
+            if ((offhand_stack.getItem() == ItemRegistry.TELEPORTING_TOTEM_OF_UNDYING.get())) {
                 offhand_stack.shrink(1);
-            }
-            else {
+            } else {
 
                 mainhand_stack.shrink(1);
 
@@ -251,7 +245,7 @@ public abstract class LivingEntityMixin  extends Entity{
             this.removeAllEffects();
             this.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 17500, 5));
 
-            if(entity instanceof ServerPlayer && !level().isClientSide()){
+            if (entity instanceof ServerPlayer && !level().isClientSide()) {
 
                 ServerPlayer player = (ServerPlayer) entity;
                 ServerLevel dest = Objects.requireNonNullElse(player.getServer().getLevel(player.getRespawnDimension()), player.getServer().overworld());
@@ -277,9 +271,10 @@ public abstract class LivingEntityMixin  extends Entity{
 
 //                the_server.tell(teleport_shift);
 
-                dest.getChunkSource().addRegionTicket(TicketType.POST_TELEPORT, new ChunkPos(SectionPos.posToSectionCoord(player.getRespawnPosition().getX()), SectionPos.posToSectionCoord(player.getRespawnPosition().getZ())), 1, player.getId());
-                player.changeDimension(new DimensionTransition(dest, this.position(), player.getDeltaMovement(),player.getYRot(), player.getXRot(), DimensionTransition.DO_NOTHING));
-                player.teleportTo(dest, player.getRespawnPosition().getX(), player.getRespawnPosition().getY(), player.getRespawnPosition().getZ(), 5.0F, 5.0F);
+//                dest.getChunkSource().addRegionTicket(TicketType.START, new ChunkPos(Objects.requireNonNull(player.getRespawnPosition())), 1, Unit.INSTANCE);
+                ServerPlayer.placeEnderPearlTicket(Objects.requireNonNull(player.getServer().getLevel(player.getRespawnDimension())), new ChunkPos(Objects.requireNonNull(player.getRespawnPosition())));
+                player.teleport(new TeleportTransition(dest, this.position(), player.getDeltaMovement(), player.getYRot(), player.getXRot(), TeleportTransition.DO_NOTHING));
+                player.teleportTo(player.getRespawnPosition().getX(), player.getRespawnPosition().getY(), player.getRespawnPosition().getZ());
 
                 this.level().addParticle(ParticleTypes.PORTAL,
                         this.getRandomX(0.5D),
@@ -296,11 +291,10 @@ public abstract class LivingEntityMixin  extends Entity{
     }
 
 
-
     @Inject(at = @At("HEAD"), method = "checkTotemDeathProtection", cancellable = true)
     public void useGhastlyTotem(DamageSource damageSource_1, CallbackInfoReturnable<Boolean> callback) {
         /*inits PlayerEntity entity, which is a copy of this casted to Living Entity and then PlayerEntity*/
-        Entity entity =  this;
+        Entity entity = this;
 
         /*ItemStack object that is set to the offhand item that entity is carrying*/
         ItemStack offhand_stack = ((LivingEntityMixin) entity).getItemInHand(InteractionHand.OFF_HAND);
@@ -314,14 +308,12 @@ public abstract class LivingEntityMixin  extends Entity{
             if (damageSource_1.type().equals(DamageTypes.FELL_OUT_OF_WORLD)) {
 
                 callback.setReturnValue(false);
-            }
-            else {
+            } else {
                 /*sets copy to offhand_stack*/
 
-                if((offhand_stack.getItem() == ItemRegistry.GHASTLY_TOTEM_OF_UNDYING.get())) {
+                if ((offhand_stack.getItem() == ItemRegistry.GHASTLY_TOTEM_OF_UNDYING.get())) {
                     offhand_stack.shrink(1);
-                }
-                else if((mainhand_stack.getItem() == ItemRegistry.GHASTLY_TOTEM_OF_UNDYING.get())){
+                } else if ((mainhand_stack.getItem() == ItemRegistry.GHASTLY_TOTEM_OF_UNDYING.get())) {
 
                     mainhand_stack.shrink(1);
 
@@ -340,7 +332,7 @@ public abstract class LivingEntityMixin  extends Entity{
                 this.addEffect(new MobEffectInstance(MobEffects.SLOW_FALLING, 1750, 1));
 
 
-                this.level().broadcastEntityEvent(this, (byte)35);
+                this.level().broadcastEntityEvent(this, (byte) 35);
 
                 callback.setReturnValue(true);
 
@@ -354,7 +346,7 @@ public abstract class LivingEntityMixin  extends Entity{
     @Inject(at = @At("HEAD"), method = "checkTotemDeathProtection", cancellable = true)
     public void useSkeletalTotem(DamageSource damageSource_1, CallbackInfoReturnable<Boolean> callback) {
         /*inits PlayerEntity entity, which is a copy of this casted to Living Entity and then PlayerEntity*/
-        Entity entity =  this;
+        Entity entity = this;
 
         /*ItemStack object that is set to the offhand item that entity is carrying*/
         ItemStack offhand_stack = ((LivingEntityMixin) entity).getItemInHand(InteractionHand.OFF_HAND);
@@ -368,14 +360,12 @@ public abstract class LivingEntityMixin  extends Entity{
             if (damageSource_1.type().equals(DamageTypes.FELL_OUT_OF_WORLD)) {
 
                 callback.setReturnValue(false);
-            }
-            else {
+            } else {
                 /*sets copy to offhand_stack*/
                 /*deletes  totem from offhand*/
-                if((offhand_stack.getItem() == ItemRegistry.SKELETAL_TOTEM_OF_UNDYING.get())) {
+                if ((offhand_stack.getItem() == ItemRegistry.SKELETAL_TOTEM_OF_UNDYING.get())) {
                     offhand_stack.shrink(1);
-                }
-                else if((mainhand_stack.getItem() == ItemRegistry.SKELETAL_TOTEM_OF_UNDYING.get())){
+                } else if ((mainhand_stack.getItem() == ItemRegistry.SKELETAL_TOTEM_OF_UNDYING.get())) {
 
                     mainhand_stack.shrink(1);
 
@@ -393,7 +383,7 @@ public abstract class LivingEntityMixin  extends Entity{
                 this.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 350, 1));
                 this.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 250, 0));
 
-                this.level().broadcastEntityEvent(this, (byte)35);
+                this.level().broadcastEntityEvent(this, (byte) 35);
 
                 callback.setReturnValue(true);
 
@@ -408,7 +398,7 @@ public abstract class LivingEntityMixin  extends Entity{
     @Inject(at = @At("HEAD"), method = "checkTotemDeathProtection", cancellable = true)
     public void useTentacledTotem(DamageSource damageSource_1, CallbackInfoReturnable<Boolean> callback) {
         /*inits PlayerEntity entity, which is a copy of this casted to Living Entity and then PlayerEntity*/
-        Entity entity =  this;
+        Entity entity = this;
 
         /*ItemStack object that is set to the offhand item that entity is carrying*/
         ItemStack offhand_stack = ((LivingEntityMixin) entity).getItemInHand(InteractionHand.OFF_HAND);
@@ -422,14 +412,12 @@ public abstract class LivingEntityMixin  extends Entity{
             if (damageSource_1.type().equals(DamageTypes.FELL_OUT_OF_WORLD)) {
 
                 callback.setReturnValue(false);
-            }
-            else {
+            } else {
                 /*sets copy to offhand_stack*/
                 /*deletes  totem from offhand*/
-                if((offhand_stack.getItem() == ItemRegistry.TENTACLED_TOTEM_OF_UNDYING.get())) {
+                if ((offhand_stack.getItem() == ItemRegistry.TENTACLED_TOTEM_OF_UNDYING.get())) {
                     offhand_stack.shrink(1);
-                }
-                else if((mainhand_stack.getItem() == ItemRegistry.TENTACLED_TOTEM_OF_UNDYING.get())){
+                } else if ((mainhand_stack.getItem() == ItemRegistry.TENTACLED_TOTEM_OF_UNDYING.get())) {
 
                     mainhand_stack.shrink(1);
 
@@ -449,12 +437,9 @@ public abstract class LivingEntityMixin  extends Entity{
                 this.addEffect(new MobEffectInstance(MobEffects.DOLPHINS_GRACE, 950, 0));
 
 
-
-                this.level().broadcastEntityEvent(this, (byte)35);
+                this.level().broadcastEntityEvent(this, (byte) 35);
 
                 callback.setReturnValue(true);
-
-
 
 
             }
@@ -464,29 +449,27 @@ public abstract class LivingEntityMixin  extends Entity{
     }
 
 
-
-    @Inject(at = @At("RETURN"), method = "hurt", cancellable = true)
-    public void applyCephalopodEffect(DamageSource source, float amount, CallbackInfoReturnable<Boolean> callback) {
+    @Final
+    @Inject(at = @At("RETURN"), method = "hurtServer")
+    public void applyCephalopodEffect(ServerLevel $$0, DamageSource source, float $$2, CallbackInfoReturnable<Boolean> cir) {
 
         Entity entity3 = source.getEntity();
 
-        Entity entity =  this;
+        Entity entity = this;
 
 
-        if(entity3 instanceof LivingEntity) {
+        if (entity3 instanceof LivingEntity) {
 
-            if(entity3 != null) {
+            if (entity3 != null) {
 
-                if(((LivingEntity) entity3).hasEffect(StatusEffectRegistry.CEPHALOPOD))
-                {
+                if (((LivingEntity) entity3).hasEffect(StatusEffectRegistry.CEPHALOPOD)) {
 
                     this.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 450, 1));
-                    callback.setReturnValue(true);
+                    cir.setReturnValue(true);
 
-                }
-                else {
+                } else {
 
-                    if(((LivingEntityMixin) entity).hasEffect(StatusEffectRegistry.CEPHALOPOD)) {
+                    if (((LivingEntityMixin) entity).hasEffect(StatusEffectRegistry.CEPHALOPOD)) {
 
                         ((LivingEntity) entity3).addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 450, 1));
                         ((LivingEntity) entity3).addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 150, 0));
@@ -496,10 +479,9 @@ public abstract class LivingEntityMixin  extends Entity{
 
                 }
 
-            }
-            else {
+            } else {
 
-                callback.setReturnValue(false);
+                cir.setReturnValue(false);
 
             }
 
@@ -512,7 +494,7 @@ public abstract class LivingEntityMixin  extends Entity{
     @Inject(at = @At("HEAD"), method = "checkTotemDeathProtection", cancellable = true)
     public void useRottingTotem(DamageSource damageSource_1, CallbackInfoReturnable<Boolean> callback) {
         /*inits PlayerEntity entity, which is a copy of this casted to Living Entity and then PlayerEntity*/
-        Entity entity =  this;
+        Entity entity = this;
 
         /*ItemStack object that is set to the offhand item that entity is carrying*/
         ItemStack offhand_stack = ((LivingEntityMixin) entity).getItemInHand(InteractionHand.OFF_HAND);
@@ -526,14 +508,12 @@ public abstract class LivingEntityMixin  extends Entity{
             if (damageSource_1.type().equals(DamageTypes.FELL_OUT_OF_WORLD)) {
 
                 callback.setReturnValue(false);
-            }
-            else {
+            } else {
                 /*sets copy to offhand_stack*/
                 /*deletes  totem from offhand*/
-                if((offhand_stack.getItem() == ItemRegistry.ROTTING_TOTEM_OF_UNDYING.get())) {
+                if ((offhand_stack.getItem() == ItemRegistry.ROTTING_TOTEM_OF_UNDYING.get())) {
                     offhand_stack.shrink(1);
-                }
-                else if((mainhand_stack.getItem() == ItemRegistry.ROTTING_TOTEM_OF_UNDYING.get())){
+                } else if ((mainhand_stack.getItem() == ItemRegistry.ROTTING_TOTEM_OF_UNDYING.get())) {
 
                     mainhand_stack.shrink(1);
 
@@ -543,14 +523,14 @@ public abstract class LivingEntityMixin  extends Entity{
                 /*totem saves player from an untimely death*/
                 this.setHealth(1.0F);
                 this.removeAllEffects();
-                this.addEffect(new MobEffectInstance(StatusEffectRegistry.NECROSIS,2000,0));
-                this.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 300,2));
+                this.addEffect(new MobEffectInstance(StatusEffectRegistry.NECROSIS, 2000, 0));
+                this.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 300, 2));
                 this.addEffect(new MobEffectInstance(MobEffects.POISON, 400, 0));
 
-                SummonedZombieEntity zombie_spawn = EntityRegistry.SUMMONED_ZOMBIE.get().create(level());
-                SummonedZombieEntity zombie_spawn_two = EntityRegistry.SUMMONED_ZOMBIE.get().create(level());
-                SummonedZombieEntity zombie_spawn_three = EntityRegistry.SUMMONED_ZOMBIE.get().create(level());
-                SummonedZombieEntity zombie_spawn_four = EntityRegistry.SUMMONED_ZOMBIE.get().create(level());
+                SummonedZombieEntity zombie_spawn = EntityRegistry.SUMMONED_ZOMBIE.get().create(level(), EntitySpawnReason.SPAWN_ITEM_USE);
+                SummonedZombieEntity zombie_spawn_two = EntityRegistry.SUMMONED_ZOMBIE.get().create(level(), EntitySpawnReason.SPAWN_ITEM_USE);
+                SummonedZombieEntity zombie_spawn_three = EntityRegistry.SUMMONED_ZOMBIE.get().create(level(), EntitySpawnReason.SPAWN_ITEM_USE);
+                SummonedZombieEntity zombie_spawn_four = EntityRegistry.SUMMONED_ZOMBIE.get().create(level(), EntitySpawnReason.SPAWN_ITEM_USE);
 
                 assert zombie_spawn != null;
                 zombie_spawn.setSummoner(this);
@@ -561,13 +541,13 @@ public abstract class LivingEntityMixin  extends Entity{
                 assert zombie_spawn_four != null;
                 zombie_spawn_four.setSummoner(this);
 
-                zombie_spawn.moveTo(this.getX(), this.getY(), this.getZ()+3, 0, 0);
+                zombie_spawn.moveTo(this.getX(), this.getY(), this.getZ() + 3, 0, 0);
 
-                zombie_spawn_two.moveTo(this.getX() , this.getY(), this.getZ()-3, 0, 0);
+                zombie_spawn_two.moveTo(this.getX(), this.getY(), this.getZ() - 3, 0, 0);
 
-                zombie_spawn_three.moveTo(this.getX() -3, this.getY(), this.getZ(), 0, 0);
+                zombie_spawn_three.moveTo(this.getX() - 3, this.getY(), this.getZ(), 0, 0);
 
-                zombie_spawn_four.moveTo(this.getX()+2, this.getY(), this.getZ()+2, 0, 0);
+                zombie_spawn_four.moveTo(this.getX() + 2, this.getY(), this.getZ() + 2, 0, 0);
 
                 level().addFreshEntity(zombie_spawn);
 
@@ -577,7 +557,7 @@ public abstract class LivingEntityMixin  extends Entity{
 
                 level().addFreshEntity(zombie_spawn_four);
 
-                this.level().broadcastEntityEvent(this, (byte)35);
+                this.level().broadcastEntityEvent(this, (byte) 35);
 
                 callback.setReturnValue(true);
 
@@ -589,21 +569,16 @@ public abstract class LivingEntityMixin  extends Entity{
     }
 
 
-
-
     @Inject(at = @At("HEAD"), method = "isInvertedHealAndHarm", cancellable = true)
     public void NecroCheck(CallbackInfoReturnable<Boolean> callback) {
 
-        if (this.hasEffect(StatusEffectRegistry.NECROSIS)){
+        if (this.hasEffect(StatusEffectRegistry.NECROSIS)) {
             callback.setReturnValue(true);
-        }
-        else if(this.getType().is(EntityTypeTags.UNDEAD)) {
+        } else if (this.getType().is(EntityTypeTags.UNDEAD)) {
             callback.setReturnValue(true);
         }
 
     }
-
-
 
 
 }

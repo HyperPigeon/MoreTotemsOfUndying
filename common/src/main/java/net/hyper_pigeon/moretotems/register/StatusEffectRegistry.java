@@ -15,7 +15,7 @@ import net.minecraft.world.effect.MobEffectCategory;
 import java.util.function.Supplier;
 
 public class StatusEffectRegistry {
-    
+
     public static final Holder<MobEffect> SNIPER = registerMobEffect("sniper", new Sniper(MobEffectCategory.BENEFICIAL, 13420603));
     public static final  Holder<MobEffect> CEPHALOPOD = registerMobEffect("cephalopod",new Cephalopod(MobEffectCategory.BENEFICIAL, 23245245));
     public static final Holder<MobEffect> NECROSIS = registerMobEffect("necrosis",new Necrosis(MobEffectCategory.BENEFICIAL, 23245245));

@@ -6,12 +6,8 @@
     "GGG"
   ],
   "key": {
-    "G": {
-      "item": "minecraft:ghast_tear"
-    },
-    "T": {
-      "item": "minecraft:totem_of_undying"
-    }
+    "G": "minecraft:ghast_tear",
+    "T": "minecraft:totem_of_undying"
   },
   "result": {
     "id": "moretotems:ghastly_totem_of_undying",

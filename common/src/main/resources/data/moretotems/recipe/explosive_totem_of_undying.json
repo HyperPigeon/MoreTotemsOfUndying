@@ -1,20 +1,16 @@
 {
   "type": "minecraft:crafting_shaped",
+  "key": {
+    "G": "minecraft:gunpowder",
+    "T": "minecraft:totem_of_undying"
+  },
   "pattern": [
     "GGG",
     "GTG",
     "GGG"
   ],
-  "key": {
-    "G": {
-      "item": "minecraft:gunpowder"
-    },
-    "T": {
-      "item": "minecraft:totem_of_undying"
-    }
-  },
   "result": {
-    "id": "moretotems:explosive_totem_of_undying",
-    "count": 1
+    "count": 1,
+    "id": "moretotems:explosive_totem_of_undying"
   }
 }
