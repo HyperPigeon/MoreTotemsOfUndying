@@ -70,7 +70,6 @@ public abstract class LivingEntityMixin extends Entity {
 
     public EntityType<SummonedBeeEntity> s_bee = EntityRegistry.SUMMONED_BEE.get();
 
-    public MinecraftServer the_server = getServer();
 
     protected LivingEntityMixin(EntityType<?> entityType_1, Level world_1) {
         super(entityType_1, world_1);
@@ -115,14 +114,14 @@ public abstract class LivingEntityMixin extends Entity {
                 this.removeAllEffects();
                 this.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 125, 2));
                 this.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 350, 4));
-                this.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 100, 3));
+                this.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 100, 3));
                 this.level().broadcastEntityEvent(this, (byte) 35);
 
                 /*Spawns a tntEntity on the player upon use of Explosive Totem*/
 
                 PrimedTnt tntEntity = EntityType.TNT.create(level(), EntitySpawnReason.SPAWN_ITEM_USE);
                 tntEntity.setFuse(10);
-                tntEntity.moveTo(this.getX(), this.getY(), this.getZ(), 0, 0);
+                tntEntity.snapTo(this.getX(), this.getY(), this.getZ(), 0, 0);
                 level().addFreshEntity(tntEntity);
 
                 callback.setReturnValue(true);
@@ -177,34 +176,34 @@ public abstract class LivingEntityMixin extends Entity {
 
                 SummonedBeeEntity summonedBeeEntity_1 = s_bee.create(level(), EntitySpawnReason.SPAWN_ITEM_USE);
                 summonedBeeEntity_1.setSummoner(this);
-                summonedBeeEntity_1.moveTo(this.getX(), this.getY() + 1, this.getZ(), 0, 0);
+                summonedBeeEntity_1.snapTo(this.getX(), this.getY() + 1, this.getZ(), 0, 0);
                 level().addFreshEntity(summonedBeeEntity_1);
 
 
                 SummonedBeeEntity summonedBeeEntity_2 = s_bee.create(level(), EntitySpawnReason.SPAWN_ITEM_USE);
                 summonedBeeEntity_2.setSummoner(this);
-                summonedBeeEntity_2.moveTo(this.getX(), this.getY() + 1, this.getZ(), 0, 0);
+                summonedBeeEntity_2.snapTo(this.getX(), this.getY() + 1, this.getZ(), 0, 0);
                 level().addFreshEntity(summonedBeeEntity_2);
 
                 SummonedBeeEntity summonedBeeEntity_3 = s_bee.create(level(), EntitySpawnReason.SPAWN_ITEM_USE);
                 summonedBeeEntity_3.setSummoner(this);
-                summonedBeeEntity_3.moveTo(this.getX() + 1, this.getY() + 1, this.getZ(), 0, 0);
+                summonedBeeEntity_3.snapTo(this.getX() + 1, this.getY() + 1, this.getZ(), 0, 0);
                 level().addFreshEntity(summonedBeeEntity_3);
 
                 SummonedBeeEntity summonedBeeEntity_4 = s_bee.create(level(), EntitySpawnReason.SPAWN_ITEM_USE);
                 summonedBeeEntity_4.setSummoner(this);
-                summonedBeeEntity_4.moveTo(this.getX(), this.getY() + 1, this.getZ() + 1, 0, 0);
+                summonedBeeEntity_4.snapTo(this.getX(), this.getY() + 1, this.getZ() + 1, 0, 0);
                 level().addFreshEntity(summonedBeeEntity_4);
 
                 SummonedBeeEntity summonedBeeEntity_5 = s_bee.create(level(), EntitySpawnReason.SPAWN_ITEM_USE);
                 summonedBeeEntity_5.setSummoner(this);
-                summonedBeeEntity_5.moveTo(this.getX() - 1, this.getY() + 1, this.getZ(), 0, 0);
+                summonedBeeEntity_5.snapTo(this.getX() - 1, this.getY() + 1, this.getZ(), 0, 0);
                 level().addFreshEntity(summonedBeeEntity_5);
 
 
                 SummonedBeeEntity summonedBeeEntity_6 = s_bee.create(level(), EntitySpawnReason.SPAWN_ITEM_USE);
                 summonedBeeEntity_5.setSummoner(this);
-                summonedBeeEntity_5.moveTo(this.getX(), this.getY() + 1, this.getZ() - 1, 0, 0);
+                summonedBeeEntity_5.snapTo(this.getX(), this.getY() + 1, this.getZ() - 1, 0, 0);
                 level().addFreshEntity(summonedBeeEntity_6);
 
                 callback.setReturnValue(true);
@@ -248,33 +247,10 @@ public abstract class LivingEntityMixin extends Entity {
             if (entity instanceof ServerPlayer && !level().isClientSide()) {
 
                 ServerPlayer player = (ServerPlayer) entity;
-                ServerLevel dest = Objects.requireNonNullElse(player.getServer().getLevel(player.getRespawnDimension()), player.getServer().overworld());
-//                Vec3 spawn_pointer = Optional.ofNullable(player.getRespawnPosition())
-//                        // Get player respawn position
-//                        .flatMap(pos -> ServerPlayer.findRespawnPositionAndUseSpawnBlock(true,DimensionTransition.DO_NOTHING))
-//                        .orElseGet(() -> {
-//                            // Get world spawn if not possible
-//                            BlockPos worldSpawn = dest.getSharedSpawnPos();
-//                            return new Vec3(worldSpawn.getX() + 0.5, worldSpawn.getY() + 0.1, worldSpawn.getZ() + 0.5);
-//                        });
-
-//                Vec3 spawn_pointer = Vec3.atLowerCornerOf(player.getRespawnPosition());
-
-//                TickTask teleport_shift = new TickTask((getServer().getTickCount()) + 1, () -> {
-//                    // Load chunk for spawning
-//                    dest.getChunkSource().addRegionTicket(TicketType.POST_TELEPORT, new ChunkPos(SectionPos.posToSectionCoord(spawn_pointer.x), SectionPos.posToSectionCoord(spawn_pointer.z)), 1, player.getId());
-//                    player.changeDimension(new DimensionTransition(dest, this.position(), player.getDeltaMovement(),player.getYRot(), player.getXRot(), DimensionTransition.DO_NOTHING));
-//                    player.teleportTo(dest, spawn_pointer.x(), spawn_pointer.y(), spawn_pointer.z(), 5.0F, 5.0F);
-//                });
-
-//                player.teleportTo();
-
-//                the_server.tell(teleport_shift);
-
-//                dest.getChunkSource().addRegionTicket(TicketType.START, new ChunkPos(Objects.requireNonNull(player.getRespawnPosition())), 1, Unit.INSTANCE);
-                ServerPlayer.placeEnderPearlTicket(Objects.requireNonNull(player.getServer().getLevel(player.getRespawnDimension())), new ChunkPos(Objects.requireNonNull(player.getRespawnPosition())));
+                ServerLevel dest = Objects.requireNonNullElse(level().getServer().getLevel(player.getRespawnConfig().respawnData().dimension()), Objects.requireNonNull(level().getServer()).overworld());
+                ServerPlayer.placeEnderPearlTicket(Objects.requireNonNull(level().getServer().getLevel(player.getRespawnConfig().respawnData().dimension())), new ChunkPos(Objects.requireNonNull(player.getRespawnConfig().respawnData().pos())));
                 player.teleport(new TeleportTransition(dest, this.position(), player.getDeltaMovement(), player.getYRot(), player.getXRot(), TeleportTransition.DO_NOTHING));
-                player.teleportTo(player.getRespawnPosition().getX(), player.getRespawnPosition().getY(), player.getRespawnPosition().getZ());
+                player.teleportTo(player.getRespawnConfig().respawnData().pos().getX(), player.getRespawnConfig().respawnData().pos().getY(), player.getRespawnConfig().respawnData().pos().getZ());
 
                 this.level().addParticle(ParticleTypes.PORTAL,
                         this.getRandomX(0.5D),
@@ -381,7 +357,7 @@ public abstract class LivingEntityMixin extends Entity {
                 this.addEffect(new MobEffectInstance(StatusEffectRegistry.SNIPER, 2000, 0));
                 this.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 600, 0));
                 this.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 350, 1));
-                this.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 250, 0));
+                this.addEffect(new MobEffectInstance(MobEffects.SPEED, 250, 0));
 
                 this.level().broadcastEntityEvent(this, (byte) 35);
 
@@ -472,7 +448,7 @@ public abstract class LivingEntityMixin extends Entity {
                     if (((LivingEntityMixin) entity).hasEffect(StatusEffectRegistry.CEPHALOPOD)) {
 
                         ((LivingEntity) entity3).addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 450, 1));
-                        ((LivingEntity) entity3).addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 150, 0));
+                        ((LivingEntity) entity3).addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 150, 0));
 
                     }
 
@@ -533,21 +509,21 @@ public abstract class LivingEntityMixin extends Entity {
                 SummonedZombieEntity zombie_spawn_four = EntityRegistry.SUMMONED_ZOMBIE.get().create(level(), EntitySpawnReason.SPAWN_ITEM_USE);
 
                 assert zombie_spawn != null;
-                zombie_spawn.setSummoner(this);
+                zombie_spawn.setSummoner((LivingEntity)(Object)this);
                 assert zombie_spawn_two != null;
-                zombie_spawn_two.setSummoner(this);
+                zombie_spawn_two.setSummoner((LivingEntity)(Object)this);
                 assert zombie_spawn_three != null;
-                zombie_spawn_three.setSummoner(this);
+                zombie_spawn_three.setSummoner((LivingEntity)(Object)this);
                 assert zombie_spawn_four != null;
-                zombie_spawn_four.setSummoner(this);
+                zombie_spawn_four.setSummoner((LivingEntity)(Object)this);
 
-                zombie_spawn.moveTo(this.getX(), this.getY(), this.getZ() + 3, 0, 0);
+                zombie_spawn.snapTo(this.getX(), this.getY(), this.getZ() + 3, 0, 0);
 
-                zombie_spawn_two.moveTo(this.getX(), this.getY(), this.getZ() - 3, 0, 0);
+                zombie_spawn_two.snapTo(this.getX(), this.getY(), this.getZ() - 3, 0, 0);
 
-                zombie_spawn_three.moveTo(this.getX() - 3, this.getY(), this.getZ(), 0, 0);
+                zombie_spawn_three.snapTo(this.getX() - 3, this.getY(), this.getZ(), 0, 0);
 
-                zombie_spawn_four.moveTo(this.getX() + 2, this.getY(), this.getZ() + 2, 0, 0);
+                zombie_spawn_four.snapTo(this.getX() + 2, this.getY(), this.getZ() + 2, 0, 0);
 
                 level().addFreshEntity(zombie_spawn);
 

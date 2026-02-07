@@ -1,5 +1,6 @@
 package net.hyper_pigeon.moretotems.effects;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffects;
@@ -11,7 +12,7 @@ public class Necrosis extends MobEffect {
         super(statusEffectCategory, i);
     }
 
-    public boolean applyEffectTick(LivingEntity entity, int i) {
+    public boolean applyEffectTick(ServerLevel level, LivingEntity entity, int amplifier) {
         if(entity.hasEffect(MobEffects.POISON)) {
             entity.heal(0.3F);
         }

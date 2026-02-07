@@ -1,18 +1,12 @@
 package net.hyper_pigeon.moretotems.register;
 
-import net.hyper_pigeon.moretotems.Constants;
 import net.hyper_pigeon.moretotems.MoreTotemsMod;
 import net.hyper_pigeon.moretotems.effects.Cephalopod;
 import net.hyper_pigeon.moretotems.effects.Necrosis;
 import net.hyper_pigeon.moretotems.effects.Sniper;
 import net.minecraft.core.Holder;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
-
-import java.util.function.Supplier;
 
 public class StatusEffectRegistry {
 

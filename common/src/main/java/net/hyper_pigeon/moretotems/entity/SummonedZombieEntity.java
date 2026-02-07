@@ -1,18 +1,21 @@
 package net.hyper_pigeon.moretotems.entity;
 
 import net.hyper_pigeon.moretotems.goals.FollowZombieSummonerGoal;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityReference;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.ZombieAttackGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -20,7 +23,7 @@ import java.util.UUID;
 public class SummonedZombieEntity extends Zombie {
 
 
-    protected static final EntityDataAccessor<Optional<UUID>> SUMMONER_UUID;
+    protected static final EntityDataAccessor<Optional<EntityReference<LivingEntity>>> SUMMONER_REF;
 
 
     public SummonedZombieEntity(EntityType<? extends Zombie> type, Level world) {
@@ -38,7 +41,7 @@ public class SummonedZombieEntity extends Zombie {
 
     protected void defineSynchedData(net.minecraft.network.syncher.SynchedEntityData.Builder syncedDataBuilder) {
         super.defineSynchedData(syncedDataBuilder);
-        syncedDataBuilder.define(SUMMONER_UUID, Optional.empty());
+        syncedDataBuilder.define(SUMMONER_REF, Optional.empty());
     }
 
     @Override
@@ -54,43 +57,41 @@ public class SummonedZombieEntity extends Zombie {
     }
 
 
-    private void setSummonerUuid(UUID uuid) {
-        this.entityData.set(SUMMONER_UUID, Optional.ofNullable(uuid));
+    private void setSummonerRef(@Nullable EntityReference<LivingEntity> summoner) {
+        this.entityData.set(SUMMONER_REF, Optional.ofNullable(summoner));
     }
 
-    public Optional<UUID> getSummonerUuid() {
-        return this.entityData.get(SUMMONER_UUID);
+    public Optional<EntityReference<LivingEntity>> getSummonerRef() {
+        return this.entityData.get(SUMMONER_REF);
     }
 
-    public void setSummoner(Entity player) {
-        this.setSummonerUuid(player.getUUID());
+    public void setSummoner(LivingEntity livingEntity) {
+        this.entityData.set(SUMMONER_REF,Optional.ofNullable(livingEntity).map(EntityReference::of));
     }
 
-    public void addAdditionalSaveData(CompoundTag tag) {
+    public void addAdditionalSaveData(ValueOutput tag) {
         super.addAdditionalSaveData(tag);
-        getSummonerUuid().ifPresent(uuid -> {
-            tag.putString("SummonerUUID", uuid.toString());
+        Optional<EntityReference<@NotNull LivingEntity>> entityreference = this.getSummonerRef();
+        entityreference.ifPresent(ref -> {
+            EntityReference.store(ref, tag, "Summoner");
         });
+
     }
 
-    public void readAdditionalSaveData(CompoundTag tag) {
+    public void readAdditionalSaveData(@NotNull ValueInput tag) {
         super.readAdditionalSaveData(tag);
-        UUID id;
-        if (tag.contains("SummonerUUID")) {
-            id = tag.getUUID("SummonerUUID");
+        EntityReference<@NotNull LivingEntity> entityreference = EntityReference.readWithOldOwnerConversion(tag, "Summoner", this.level());
+        if (entityreference != null) {
+            this.entityData.set(SUMMONER_REF, Optional.of(entityreference));
         } else {
-            id = tag.getUUID("SummonerUUID");
-        }
-        if (id != null) {
-            this.setSummonerUuid(tag.getUUID("SummonerUUID"));
+            this.entityData.set(SUMMONER_REF, Optional.empty());
         }
     }
 
 
     @Override
     public void setLastHurtByMob(LivingEntity attacker) {
-        if (attacker == getSummoner()) {
-        } else {
+        if (attacker != getSummoner()) {
             super.setLastHurtByMob(attacker);
         }
     }
@@ -113,15 +114,20 @@ public class SummonedZombieEntity extends Zombie {
 
     public LivingEntity getSummoner() {
         try {
-            Optional<UUID> uUID = this.getSummonerUuid();
-            return uUID.map(value -> this.level().getPlayerByUUID(value)).orElse(null);
+            if(this.getSummonerRef().isPresent()) {
+                Optional<UUID> uUID = Optional.of(this.getSummonerRef().get().getUUID());
+                return (LivingEntity) uUID.map(value -> this.level().getEntity(value)).orElse(null);
+            }
+            else {
+                return null;
+            }
         } catch (IllegalArgumentException var2) {
             return null;
         }
     }
 
     static {
-        SUMMONER_UUID = SynchedEntityData.defineId(SummonedZombieEntity.class, EntityDataSerializers.OPTIONAL_UUID);
+        SUMMONER_REF = SynchedEntityData.defineId(SummonedZombieEntity.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
     }
 
 

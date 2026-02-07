@@ -5,14 +5,14 @@ import net.hyper_pigeon.moretotems.MoreTotemsMod;
 import net.hyper_pigeon.moretotems.entity.SummonedBeeEntity;
 import net.hyper_pigeon.moretotems.entity.SummonedZombieEntity;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
-import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.zombie.Zombie;
 
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
@@ -30,7 +30,7 @@ public class EntityRegistry {
     }
 
     private static <T extends Mob> Supplier<EntityType<T>> registerEntity(String name, EntityType.EntityFactory<T> entity, float width, float height, MobCategory mobCategory) {
-        ResourceLocation resourceLocation = ResourceLocation.fromNamespaceAndPath(Constants.MOD_ID, name);
+        Identifier resourceLocation = Identifier.fromNamespaceAndPath(Constants.MOD_ID, name);
         ResourceKey<EntityType<?>> key =  ResourceKey.create(Registries.ENTITY_TYPE, resourceLocation);
         return MoreTotemsMod.COMMON_PLATFORM.registerEntity(name, () -> EntityType.Builder.of(entity,mobCategory).sized(width, height).build(key));
     }
