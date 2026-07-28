@@ -1,6 +1,6 @@
 package net.hyper_pigeon.moretotems;
 
-import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
+import net.fabricmc.fabric.api.creativetab.v1.FabricCreativeModeTab;
 import net.hyper_pigeon.moretotems.platform.MoreTotemsModPlatform;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
@@ -84,7 +84,7 @@ public class MoreTotemsModFabricPlatform implements MoreTotemsModPlatform {
 
     @Override
     public CreativeModeTab.Builder newCreativeTabBuilder() {
-        return FabricItemGroup.builder();
+        return FabricCreativeModeTab.builder();
     }
 
     /**

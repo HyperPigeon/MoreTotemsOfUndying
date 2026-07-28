@@ -119,7 +119,7 @@ public abstract class LivingEntityMixin extends Entity {
 
                 /*Spawns a tntEntity on the player upon use of Explosive Totem*/
 
-                PrimedTnt tntEntity = EntityType.TNT.create(level(), EntitySpawnReason.SPAWN_ITEM_USE);
+                PrimedTnt tntEntity = new PrimedTnt(level(), this.getX(), this.getY(), this.getZ(), null);
                 tntEntity.setFuse(10);
                 tntEntity.snapTo(this.getX(), this.getY(), this.getZ(), 0, 0);
                 level().addFreshEntity(tntEntity);
@@ -248,7 +248,7 @@ public abstract class LivingEntityMixin extends Entity {
 
                 ServerPlayer player = (ServerPlayer) entity;
                 ServerLevel dest = Objects.requireNonNullElse(level().getServer().getLevel(player.getRespawnConfig().respawnData().dimension()), Objects.requireNonNull(level().getServer()).overworld());
-                ServerPlayer.placeEnderPearlTicket(Objects.requireNonNull(level().getServer().getLevel(player.getRespawnConfig().respawnData().dimension())), new ChunkPos(Objects.requireNonNull(player.getRespawnConfig().respawnData().pos())));
+                ServerPlayer.placeEnderPearlTicket(Objects.requireNonNull(level().getServer().getLevel(player.getRespawnConfig().respawnData().dimension())), new ChunkPos(SectionPos.blockToSectionCoord(player.getRespawnConfig().respawnData().pos().getX()), SectionPos.blockToSectionCoord(player.getRespawnConfig().respawnData().pos().getZ())));
                 player.teleport(new TeleportTransition(dest, this.position(), player.getDeltaMovement(), player.getYRot(), player.getXRot(), TeleportTransition.DO_NOTHING));
                 player.teleportTo(player.getRespawnConfig().respawnData().pos().getX(), player.getRespawnConfig().respawnData().pos().getY(), player.getRespawnConfig().respawnData().pos().getZ());
 
@@ -550,7 +550,7 @@ public abstract class LivingEntityMixin extends Entity {
 
         if (this.hasEffect(StatusEffectRegistry.NECROSIS)) {
             callback.setReturnValue(true);
-        } else if (this.getType().is(EntityTypeTags.UNDEAD)) {
+        } else if (this.getType().builtInRegistryHolder().is(EntityTypeTags.UNDEAD)) {
             callback.setReturnValue(true);
         }
 
